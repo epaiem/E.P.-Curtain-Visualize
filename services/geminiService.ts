@@ -1,4 +1,4 @@
-import { GoogleGenAI, SchemaType } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 // Helper to get closest supported aspect ratio
 function getClosestAspectRatio(width: number, height: number): string {
@@ -123,7 +123,17 @@ export async function analyzeRoomSettings(imageBase64: string): Promise<RoomAnal
         ]
       },
       config: {
-        responseMimeType: 'application/json'
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            styleId: { type: Type.STRING },
+            curtainTypeKeyword: { type: Type.STRING },
+            colorId: { type: Type.STRING },
+            layerId: { type: Type.STRING },
+            reasoning: { type: Type.STRING },
+          }
+        }
       }
     });
 

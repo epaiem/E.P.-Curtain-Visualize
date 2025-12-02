@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import ImageUpload from './components/ImageUpload';
 import StyleCard from './components/StyleCard';
+import Login from './components/Login';
 import { INTERIOR_STYLES, CURTAIN_COLORS, CURTAIN_LAYERS } from './constants';
 import { InteriorStyle, CurtainOption, CurtainColor, CurtainLayer } from './types';
 import { generateCurtainDesign, analyzeRoomSettings } from './services/geminiService';
 import { Sparkles, RefreshCcw, Download, XCircle, Check, Layers, Wand2 } from 'lucide-react';
+import { auth } from './services/firebase';
+import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 
 const App: React.FC = () => {
+  // Auth State
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+
+  // App State
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<InteriorStyle | null>(null);
@@ -18,6 +26,22 @@ const App: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisReasoning, setAnalysisReasoning] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setIsLoadingAuth(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
 
   const handleGenerate = async () => {
     if (!originalImage || !selectedCurtain || !selectedColor || !selectedLayer) return;
@@ -127,9 +151,24 @@ const App: React.FC = () => {
     }
   }, [selectedCurtain]);
 
+  // Render Loading
+  if (isLoadingAuth) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Render Login if not authenticated
+  if (!user) {
+    return <Login />;
+  }
+
+  // Render Main App if authenticated
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <Header />
+      <Header onLogout={handleLogout} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
         {/* Intro Section */}
