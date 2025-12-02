@@ -1,0 +1,7 @@
+{
+  "name": "E.P. Curtain Visualize",
+  "description": "Visualizes different curtain styles on your windows using AI to help choose the perfect interior design match.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
