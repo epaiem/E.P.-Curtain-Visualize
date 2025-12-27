@@ -125,7 +125,7 @@ const Login: React.FC = () => {
               © E.P. DECOR - Authorized Personnel Only
             </p>
             <p className="text-xs text-slate-300 mt-2">
-              (กรุณาสร้าง Users ใน Firebase Console > Authentication ก่อนใช้งาน)
+              (กรุณาสร้าง Users ใน Firebase Console &gt; Authentication ก่อนใช้งาน)
             </p>
           </div>
         </div>
